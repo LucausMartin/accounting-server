@@ -2,16 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as nodeMailer from 'nodemailer';
-import { RegisterItemType } from './users.interface';
+import { StayStateItemType } from './users.interface';
 import { Users } from './users.entities';
+import { RegisterErrorTypeEnums, LoginErrorTypeEnums } from './users.constants';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(Users)
-    private usersRepository: Repository<Users>,
+    private readonly usersRepository: Repository<Users>,
+    private readonly jwtService: JwtService,
   ) {}
 
+  // 邮件传输器
   private ransporter = nodeMailer.createTransport({
     host: 'smtp.qq.com',
     secure: true,
@@ -21,7 +25,10 @@ export class UsersService {
     },
   });
 
-  private registerTable: RegisterItemType[] = [];
+  // 注册表
+  private registerTable: StayStateItemType[] = [];
+  // 登录表
+  private loginTable: StayStateItemType[] = [];
 
   /**
    * @description 查询是否存在用户
@@ -29,7 +36,72 @@ export class UsersService {
    * @returns 用户信息
    */
   hasUser = async (email: string): Promise<Users> => {
-    return await this.usersRepository.findOne({ where: { email } });
+    return await this.usersRepository.findOneBy({ email });
+  };
+
+  /**
+   * @description 向登录表中添加邮箱、验证码、倒计时定时器
+   * @param email  邮箱
+   * @param code 验证码
+   * @returns 添加成功状态
+   */
+  addLoginUser = async (email: string, code: string) => {
+    const sendRes = await this.sendVerificationCode(email, code);
+    if (!sendRes.res) {
+      return false;
+    }
+    const timer = setTimeout(() => {
+      this.removeFromLoginTable(email);
+    }, 5 * 60000);
+    this.loginTable.push({ email, code, timer });
+    return true;
+  };
+
+  /**
+   * @description 从登录表中删除邮箱、验证码、倒计时定时器
+   * @param email 邮箱
+   * @returns 删除成功状态
+   */
+  removeFromLoginTable = (email: string) => {
+    const index = this.loginTable.findIndex((item) => item.email === email);
+    if (index === -1) {
+      return false;
+    }
+    clearTimeout(this.loginTable[index].timer);
+    this.loginTable.splice(index, 1);
+    return true;
+  };
+
+  /**
+   * @description 向注册表中添加邮箱、验证码、倒计时定时器
+   * @param email 邮箱
+   * @returns 添加成功状态
+   */
+  addRegisterUser = async (email: string, code: string) => {
+    const sendRes = await this.sendVerificationCode(email, code);
+    if (!sendRes.res) {
+      return false;
+    }
+    const timer = setTimeout(() => {
+      this.removeFromRegisterTable(email);
+    }, 5 * 60000);
+    this.registerTable.push({ email, code, timer });
+    return true;
+  };
+
+  /**
+   * @description 从注册表中删除邮箱、验证码、倒计时定时器
+   * @param email 邮箱
+   * @returns 删除成功状态
+   */
+  removeFromRegisterTable = (email: string) => {
+    const index = this.registerTable.findIndex((item) => item.email === email);
+    if (index === -1) {
+      return false;
+    }
+    clearTimeout(this.registerTable[index].timer);
+    this.registerTable.splice(index, 1);
+    return true;
   };
 
   /**
@@ -38,7 +110,7 @@ export class UsersService {
    * @param code 验证码
    * @returns 发送成功状态
    */
-  async sendVerificationCode(email: string, code: string) {
+  sendVerificationCode = async (email: string, code: string) => {
     let status: boolean;
     let message: nodeMailer.SentMessageInfo;
     await new Promise<void>((resolve, reject) => {
@@ -71,7 +143,7 @@ export class UsersService {
       res: status,
       message,
     };
-  }
+  };
 
   /**
    * @description 随机生成英文加数字的六位验证码
@@ -79,14 +151,27 @@ export class UsersService {
    */
   generateVerificationCode(email: string) {
     // 检查是否已经发送过验证码
-    const index = this.registerTable.findIndex((item) => item.email === email);
-    if (index !== -1) {
+    const registerIndex = this.registerTable.findIndex(
+      (item) => item.email === email,
+    );
+    if (registerIndex !== -1) {
       // 重置定时器
-      clearTimeout(this.registerTable[index].timer);
-      this.registerTable[index].timer = setTimeout(() => {
+      clearTimeout(this.registerTable[registerIndex].timer);
+      this.registerTable[registerIndex].timer = setTimeout(() => {
         this.removeFromRegisterTable(email);
-      }, 60000);
-      return this.registerTable[index].code;
+      }, 5 * 60000);
+      return this.registerTable[registerIndex].code;
+    }
+    const loginIndex = this.loginTable.findIndex(
+      (item) => item.email === email,
+    );
+    if (loginIndex !== -1) {
+      // 重置定时器
+      clearTimeout(this.loginTable[loginIndex].timer);
+      this.loginTable[loginIndex].timer = setTimeout(() => {
+        this.removeFromLoginTable(email);
+      }, 5 * 60000);
+      return this.loginTable[loginIndex].code;
     }
     const letterCount = Math.floor(Math.random() * 3) + 3;
     const numberCount = 6 - letterCount;
@@ -106,42 +191,93 @@ export class UsersService {
   }
 
   /**
-   * @description 向注册表中添加邮箱、验证码、倒计时定时器
-   * @param email 邮箱
-   * @returns 添加成功状态
-   */
-  addToRegisterTable(email: string, code: string) {
-    const timer = setTimeout(() => {
-      this.removeFromRegisterTable(email);
-    }, 60000);
-    this.registerTable.push({ email, code, timer });
-    console.log(this.registerTable);
-    return true;
-  }
-
-  /**
-   * @description 从注册表中删除邮箱、验证码、倒计时定时器
-   * @param email 邮箱
-   * @returns 删除成功状态
-   */
-  removeFromRegisterTable(email: string) {
-    const index = this.registerTable.findIndex((item) => item.email === email);
-    if (index === -1) {
-      return false;
-    }
-    clearTimeout(this.registerTable[index].timer);
-    this.registerTable.splice(index, 1);
-    return true;
-  }
-
-  /**
    * @description 注册
    * @param email 邮箱
    * @param code 验证码
    * @returns 注册成功状态
    */
-  register(email: string, code: string) {
-    console.log(this.registerTable);
-    console.log(email, code);
-  }
+  register = async (email: string, code: string) => {
+    const has = await this.hasUser(email);
+    if (has) {
+      return {
+        res: false,
+        message: 'User already exists',
+        error_type: RegisterErrorTypeEnums.USER_ALREADY_EXISTS,
+      };
+    }
+    const index = this.registerTable.findIndex((item) => item.email === email);
+    if (index === -1) {
+      return {
+        res: false,
+        message: 'No sent verification code',
+        error_type: RegisterErrorTypeEnums.NO_SENT_CODE,
+      };
+    }
+    if (this.registerTable[index].code !== code) {
+      return {
+        res: false,
+        message: 'Verification code error',
+        error_type: RegisterErrorTypeEnums.CODE_ERROR,
+      };
+    }
+    const res = await this.usersRepository.insert({ email });
+    if (!res) {
+      return {
+        res: false,
+        message: 'User registration failed',
+        error_type: RegisterErrorTypeEnums.FAILED_TO_REGISTER,
+      };
+    }
+    this.removeFromRegisterTable(email);
+    return {
+      res: true,
+      message: 'Register successfully',
+    };
+  };
+
+  /**
+   * @description 登录
+   * @param email 邮箱
+   * @param code 验证码
+   * @returns 登录成功状态
+   */
+  login = async (email: string, code: string) => {
+    const index = this.loginTable.findIndex((item) => item.email === email);
+    if (index === -1) {
+      return {
+        res: false,
+        message: 'No sent verification code',
+        error_type: LoginErrorTypeEnums.NO_SENT_CODE,
+      };
+    }
+    if (this.loginTable[index].code !== code) {
+      return {
+        res: false,
+        message: 'Verification code error',
+        error_type: LoginErrorTypeEnums.CODE_ERROR,
+      };
+    }
+    const res = await this.hasUser(email);
+    if (!res) {
+      return {
+        res: false,
+        message: 'User does not exist',
+        error_type: LoginErrorTypeEnums.USER_DOES_NOT_EXIST,
+      };
+    }
+    this.removeFromLoginTable(email);
+    return {
+      res: true,
+      message: 'Login successfully',
+    };
+  };
+
+  /**
+   * @description 生成token
+   * @param email 邮箱
+   * @returns token
+   */
+  generateToken = (email: string) => {
+    return this.jwtService.sign({ email });
+  };
 }
