@@ -79,7 +79,7 @@ export class UsersController {
       });
     } else {
       return formatResponse(HTTP_STATUS.CREATED, registerUser.message, {
-        success: true,
+        auth: this.usersService.generateToken(email),
       });
     }
   }

@@ -46,7 +46,7 @@ export class UsersService {
    * @returns 添加成功状态
    */
   addLoginUser = async (email: string, code: string) => {
-    const sendRes = await this.sendVerificationCode(email, code);
+    const sendRes = await this.sendVerificationCode(email, code, true);
     if (!sendRes.res) {
       return false;
     }
@@ -78,7 +78,7 @@ export class UsersService {
    * @returns 添加成功状态
    */
   addRegisterUser = async (email: string, code: string) => {
-    const sendRes = await this.sendVerificationCode(email, code);
+    const sendRes = await this.sendVerificationCode(email, code, false);
     if (!sendRes.res) {
       return false;
     }
@@ -110,7 +110,11 @@ export class UsersService {
    * @param code 验证码
    * @returns 发送成功状态
    */
-  sendVerificationCode = async (email: string, code: string) => {
+  sendVerificationCode = async (
+    email: string,
+    code: string,
+    login: boolean,
+  ) => {
     let status: boolean;
     let message: nodeMailer.SentMessageInfo;
     await new Promise<void>((resolve, reject) => {
@@ -118,7 +122,7 @@ export class UsersService {
         {
           from: '2602685411@qq.com',
           to: email,
-          subject: '网站账户注册验证码',
+          subject: `网站账户${login ? '登录' : '注册'}验证码`,
           html:
             `
             <p>网站账户注册验证码：</p>
