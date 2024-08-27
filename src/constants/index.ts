@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { Users } from '../users/users.entities';
 
 export const DB_CONFIG: TypeOrmModuleOptions = {
   type: 'mysql',
@@ -9,4 +10,5 @@ export const DB_CONFIG: TypeOrmModuleOptions = {
   database: 'accounting-db',
   autoLoadEntities: true,
   synchronize: true,
+  entities: [Users],
 };

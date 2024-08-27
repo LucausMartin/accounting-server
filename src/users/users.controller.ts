@@ -7,17 +7,28 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('send-verification-code')
-  async sendVerificationCode(@Body('email') email: string) {
-    const code = this.usersService.generateVerificationCode(email);
-    const res = await this.usersService.sendVerificationCode(email, code);
-    if (!res.res) {
-      return formatResponse(
-        400,
-        'Failed to send verification code',
-        res.message,
-      );
+  async sendVerificationCode(
+    @Body('email') email: string,
+    @Body('email') login: boolean,
+  ) {
+    const has = await this.usersService.hasUser(email);
+    if (login && !has) {
+      return formatResponse(400, 'User not found', 'User not found');
     }
-    return formatResponse(200, 'Verification code sent successfully', res);
+    if (!login && has) {
+      return formatResponse(400, 'User already exists', 'User already exists');
+    }
+    console.log(has, login);
+    // const code = this.usersService.generateVerificationCode(email);
+    // const res = await this.usersService.sendVerificationCode(email, code);
+    // if (!res.res) {
+    //   return formatResponse(
+    //     400,
+    //     'Failed to send verification code',
+    //     res.message,
+    //   );
+    // }
+    // return formatResponse(200, 'Verification code sent successfully', res);
   }
 
   @Post('register')

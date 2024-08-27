@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as nodeMailer from 'nodemailer';
 import { RegisterItemType } from './users.interface';
+import { Users } from './users.entities';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
+  ) {}
+
   private ransporter = nodeMailer.createTransport({
     host: 'smtp.qq.com',
     secure: true,
@@ -16,15 +24,23 @@ export class UsersService {
   private registerTable: RegisterItemType[] = [];
 
   /**
+   * @description 查询是否存在用户
+   * @param email 邮箱
+   * @returns 用户信息
+   */
+  hasUser = async (email: string): Promise<Users> => {
+    return await this.usersRepository.findOne({ where: { email } });
+  };
+
+  /**
    * @description 发送验证码
    * @param email 接收验证码的邮箱
    * @param code 验证码
    * @returns 发送成功状态
    */
   async sendVerificationCode(email: string, code: string) {
-    console.log('start');
     let status: boolean;
-    let message;
+    let message: nodeMailer.SentMessageInfo;
     await new Promise<void>((resolve, reject) => {
       this.ransporter.sendMail(
         {
