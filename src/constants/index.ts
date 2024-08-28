@@ -15,7 +15,7 @@ export const DB_CONFIG: TypeOrmModuleOptions = {
 
 export const JWT_CONFIG = {
   secret: 'Betty & Lucaus',
-  signOptions: { expiresIn: '300s' },
+  signOptions: { expiresIn: '60s' },
 };
 
 export enum HTTP_STATUS {

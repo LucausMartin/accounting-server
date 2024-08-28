@@ -277,11 +277,25 @@ export class UsersService {
   };
 
   /**
-   * @description 生成token
+   * @description 生成访问 token
    * @param email 邮箱
    * @returns token
    */
-  generateToken = (email: string) => {
-    return this.jwtService.sign({ email });
+  generateAccessToken = (email: string) => {
+    return this.jwtService.sign({ email, type: 'access' });
+  };
+
+  /**
+   * @description 生成刷新 token
+   * @param email 邮箱
+   * @returns token
+   */
+  generateRefreshToken = (email: string) => {
+    return this.jwtService.sign(
+      { email, type: 'refresh' },
+      {
+        expiresIn: '7d',
+      },
+    );
   };
 }

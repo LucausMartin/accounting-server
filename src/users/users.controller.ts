@@ -2,10 +2,14 @@ import { Body, Controller, Post, UseGuards, Get, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { formatResponse } from 'src/utils';
 import { HTTP_STATUS } from 'src/constants';
-import { SendCodeErrorTypeEnums } from './users.constants';
+import {
+  SendCodeErrorTypeEnums,
+  RefreshTokenErrorTypeEnums,
+} from './users.constants';
 import { Request } from 'express';
 import { Public } from 'src/decorators/public.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RefreshJwtAuthGuard } from 'src/guards/refresh-jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -79,7 +83,8 @@ export class UsersController {
       });
     } else {
       return formatResponse(HTTP_STATUS.CREATED, registerUser.message, {
-        auth: this.usersService.generateToken(email),
+        accessToken: this.usersService.generateAccessToken(email),
+        refreshToken: this.usersService.generateRefreshToken(email),
       });
     }
   }
@@ -96,7 +101,8 @@ export class UsersController {
       });
     } else {
       return formatResponse(HTTP_STATUS.OK, loginUser.message, {
-        auth: this.usersService.generateToken(email),
+        accessToken: this.usersService.generateAccessToken(email),
+        refreshToken: this.usersService.generateRefreshToken(email),
       });
     }
   }
@@ -105,5 +111,23 @@ export class UsersController {
   @Get('test')
   async test(@Req() request: Request) {
     console.log(123, request.user);
+  }
+
+  @UseGuards(RefreshJwtAuthGuard)
+  @Get('refresh-token')
+  async refreshToken(@Req() request: Request) {
+    const { email, type } = request.user as {
+      email: string;
+      type: string;
+      exp: number;
+    };
+    if (type !== 'refresh') {
+      return formatResponse(HTTP_STATUS.BAD_REQUEST, 'Invalid token type', {
+        error_type: RefreshTokenErrorTypeEnums.TOKEN_TYPE_INVALID,
+      });
+    }
+    return formatResponse(HTTP_STATUS.OK, 'Refresh token successfully', {
+      accessToken: this.usersService.generateAccessToken(email),
+    });
   }
 }

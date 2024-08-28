@@ -25,3 +25,7 @@ export const enum LoginErrorTypeEnums {
   CODE_ERROR = 2,
   USER_DOES_NOT_EXIST = 3,
 }
+
+export const enum RefreshTokenErrorTypeEnums {
+  TOKEN_TYPE_INVALID = 2,
+}

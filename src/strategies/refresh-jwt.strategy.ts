@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JWT_CONFIG } from 'src/constants';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
+export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh') {
   constructor() {
     super({
       // 分别传入这些参数
@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'access') {
     exp: number;
     iat: number;
   }) {
-    if (payload.type !== 'access') {
+    if (payload.type !== 'refresh') {
       return false;
     }
     return payload;
