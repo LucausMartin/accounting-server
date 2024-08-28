@@ -10,7 +10,6 @@ export class RefreshJwtAuthGuard extends AuthGuard('refresh') {
   }
 
   canActivate(context: ExecutionContext): boolean {
-    console.log('JwtAuthGuard', context);
     const isPublic = this.reflector.get<boolean>(
       PUBLIC_KEY,
       context.getHandler(),

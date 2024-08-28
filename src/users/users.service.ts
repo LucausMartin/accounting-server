@@ -125,14 +125,13 @@ export class UsersService {
           subject: `网站账户${login ? '登录' : '注册'}验证码`,
           html:
             `
-            <p>网站账户注册验证码：</p>
+            <p>网站账户${login ? '登录' : '注册'}验证码：</p>
             <span style="font-size: 18px; color: red">` +
             code +
             `</span>`,
         },
         function (err: Error, info: nodeMailer.SentMessageInfo) {
           if (err) {
-            console.log(err);
             status = false;
             message = info;
             reject();

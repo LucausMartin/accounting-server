@@ -25,7 +25,6 @@ export class UsersController {
   ) {
     // 检查是否存在用户
     const user = await this.usersService.hasUser(email);
-    console.log(user, login);
     // 如果是登录操作，但是用户不存在，报错
     if (login && !user) {
       return formatResponse(HTTP_STATUS.UNAUTHORIZED, 'User not found', {
@@ -83,8 +82,8 @@ export class UsersController {
       });
     } else {
       return formatResponse(HTTP_STATUS.CREATED, registerUser.message, {
-        accessToken: this.usersService.generateAccessToken(email),
-        refreshToken: this.usersService.generateRefreshToken(email),
+        access_token: this.usersService.generateAccessToken(email),
+        refresh_token: this.usersService.generateRefreshToken(email),
       });
     }
   }
@@ -110,7 +109,10 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('test')
   async test(@Req() request: Request) {
-    console.log(123, request.user);
+    console.log(request.user);
+    return formatResponse(HTTP_STATUS.OK, 'Test successfully', {
+      user: request.user,
+    });
   }
 
   @UseGuards(RefreshJwtAuthGuard)
@@ -127,7 +129,8 @@ export class UsersController {
       });
     }
     return formatResponse(HTTP_STATUS.OK, 'Refresh token successfully', {
-      accessToken: this.usersService.generateAccessToken(email),
+      access_token: this.usersService.generateAccessToken(email),
+      refresh_token: this.usersService.generateRefreshToken(email),
     });
   }
 }
