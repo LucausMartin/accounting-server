@@ -10,6 +10,7 @@ import { Request } from 'express';
 import { Public } from 'src/decorators/public.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RefreshJwtAuthGuard } from 'src/guards/refresh-jwt-auth.guard';
+import { TokenInfoType } from 'src/types';
 
 @Controller('users')
 export class UsersController {
@@ -118,11 +119,7 @@ export class UsersController {
   @UseGuards(RefreshJwtAuthGuard)
   @Get('refresh-token')
   async refreshToken(@Req() request: Request) {
-    const { email, type } = request.user as {
-      email: string;
-      type: string;
-      exp: number;
-    };
+    const { email, type } = request.user as TokenInfoType;
     if (type !== 'refresh') {
       return formatResponse(HTTP_STATUS.BAD_REQUEST, 'Invalid token type', {
         error_type: RefreshTokenErrorTypeEnums.TOKEN_TYPE_INVALID,

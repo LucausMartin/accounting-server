@@ -22,8 +22,8 @@ export const formatResponse = (
  * @description 生成UUID
  * @returns 生成的UUID
  */
-function generateUUID() {
+export const generateUUID = () => {
   return uuidv4();
-}
+};
 
 export default generateUUID;

@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Users } from '../users/users.entities';
+import { Users } from '../apis/users/users.entities';
+import { KindsParents } from '../apis/kinds-parents/kinds-parents.entities';
 
 export const DB_CONFIG: TypeOrmModuleOptions = {
   type: 'mysql',
@@ -9,8 +10,8 @@ export const DB_CONFIG: TypeOrmModuleOptions = {
   password: '123456',
   database: 'accounting-db',
   autoLoadEntities: true,
-  synchronize: true,
-  entities: [Users],
+  synchronize: false,
+  entities: [Users, KindsParents],
 };
 
 export const JWT_CONFIG = {
