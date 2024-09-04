@@ -2,9 +2,22 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from './apis/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DB_CONFIG } from './constants';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { UploadModule } from './apis/upload/upload.module';
 import { KindsParentsModule } from './apis/kinds-parents/kinds-parents.module';
+
 @Module({
-  imports: [UsersModule, KindsParentsModule, TypeOrmModule.forRoot(DB_CONFIG)],
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '../..', 'public/uploaded'),
+      serveRoot: '/static',
+    }),
+    UploadModule,
+    UsersModule,
+    KindsParentsModule,
+    TypeOrmModule.forRoot(DB_CONFIG),
+  ],
   controllers: [],
   providers: [],
 })
