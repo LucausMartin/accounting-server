@@ -6,7 +6,6 @@ import { KindsParents } from './kinds-parents.entities';
 import { JwtModule } from '@nestjs/jwt';
 import { JWT_CONFIG } from 'src/constants';
 import { JwtStrategy } from 'src/strategies/jwt.strategy';
-import { RefreshJwtStrategy } from 'src/strategies/refresh-jwt.strategy';
 
 @Module({
   imports: [
@@ -14,6 +13,6 @@ import { RefreshJwtStrategy } from 'src/strategies/refresh-jwt.strategy';
     JwtModule.register(JWT_CONFIG),
   ],
   controllers: [KindsParentsController],
-  providers: [KindsParentsService, JwtStrategy, RefreshJwtStrategy],
+  providers: [KindsParentsService, JwtStrategy],
 })
 export class KindsParentsModule {}

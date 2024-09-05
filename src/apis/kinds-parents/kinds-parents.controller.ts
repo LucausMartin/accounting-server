@@ -14,9 +14,13 @@ export class KindsParentsController {
   @Post('create-kinds-parent')
   async createKindsParent(@Req() request: Request, @Body() body) {
     const { email } = request.user as TokenInfoType;
-    const { name } = body;
+    const { name, file_name } = body;
 
-    const res = await this.kindsParentsService.insertKindsParent(email, name);
+    const res = await this.kindsParentsService.insertKindsParent(
+      email,
+      name,
+      file_name,
+    );
     if (res) {
       return formatResponse(
         HTTP_STATUS.OK,

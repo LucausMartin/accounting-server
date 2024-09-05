@@ -110,7 +110,6 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get('test')
   async test(@Req() request: Request) {
-    console.log(request.user);
     return formatResponse(HTTP_STATUS.OK, 'Test successfully', {
       user: request.user,
     });

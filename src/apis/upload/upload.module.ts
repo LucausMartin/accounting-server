@@ -4,7 +4,13 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { UploadController } from './upload.controller';
 import { generateUUID } from 'src/utils/index';
-// import { UploadService } from './upload.service';
+import { UploadService } from './upload.service';
+import { Icons } from './icons.entities';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JWT_CONFIG } from 'src/constants';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from 'src/strategies/jwt.strategy';
+
 @Module({
   imports: [
     MulterModule.register({
@@ -18,8 +24,10 @@ import { generateUUID } from 'src/utils/index';
         },
       }),
     }),
+    TypeOrmModule.forFeature([Icons]),
+    JwtModule.register(JWT_CONFIG),
   ],
   controllers: [UploadController],
-  providers: [],
+  providers: [UploadService, JwtStrategy],
 })
 export class UploadModule {}
