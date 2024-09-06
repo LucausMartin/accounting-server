@@ -33,4 +33,19 @@ export class UploadService {
       return false;
     }
   }
+
+  /**
+   * @description 获取用户 icon
+   * @param { string } email 邮箱
+   * @returns 用户 icon
+   */
+  getAllIconsByUser(email: string) {
+    return this.IconsRepository.find({
+      where: {
+        user: {
+          email,
+        },
+      },
+    });
+  }
 }

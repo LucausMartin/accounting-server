@@ -14,12 +14,13 @@ export class KindsParentsController {
   @Post('create-kinds-parent')
   async createKindsParent(@Req() request: Request, @Body() body) {
     const { email } = request.user as TokenInfoType;
-    const { name, file_name } = body;
+    const { name, file_name, svg_code_id } = body;
 
     const res = await this.kindsParentsService.insertKindsParent(
       email,
       name,
       file_name,
+      svg_code_id,
     );
     if (res) {
       return formatResponse(

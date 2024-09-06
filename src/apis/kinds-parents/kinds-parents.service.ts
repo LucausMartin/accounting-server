@@ -17,9 +17,15 @@ export class KindsParentsService {
    * @param {string} email 用户邮箱
    * @param {string} name 种类父级名称
    * @param {string} file_name 文件名
+   * @param {string} svg_code svg 代码
    * @returns 是否创建成功
    */
-  async insertKindsParent(email: string, name: string, file_name: string) {
+  async insertKindsParent(
+    email: string,
+    name: string,
+    file_name: string,
+    svg_code_id: string,
+  ) {
     const user = new Users();
     user.email = email;
     const kindsParent = new KindsParents();
@@ -27,6 +33,7 @@ export class KindsParentsService {
     kindsParent.fileName = file_name;
     kindsParent.id = generateUUID();
     kindsParent.name = name;
+    kindsParent.svgCode = svg_code_id;
     try {
       await this.KindsParentsRepository.save(kindsParent);
       return true;

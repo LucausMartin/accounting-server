@@ -6,8 +6,12 @@ import {
   UseGuards,
   Body,
   Req,
+  Get,
 } from '@nestjs/common';
-import { UploadIconErrorTypeEnums } from './icons.constants';
+import {
+  UploadIconErrorTypeEnums,
+  GetAllIconsByUserErrorTypeEnums,
+} from './icons.constants';
 import { TokenInfoType } from 'src/types';
 import { HTTP_STATUS } from 'src/constants';
 import { formatResponse } from 'src/utils';
@@ -62,5 +66,30 @@ export class UploadController {
     return formatResponse(HTTP_STATUS.OK, 'Delete successfully', {
       success: true,
     });
+  }
+
+  // 获取用户所有 icon
+  @UseGuards(JwtAuthGuard)
+  @Get('get-all-icons-by-user')
+  async getAllIconsByUser(@Req() request: Request) {
+    const { email } = request.user as TokenInfoType;
+    const res = await this.uploadService.getAllIconsByUser(email);
+    // 将 name 前加 /static/
+    res.forEach((item) => {
+      item.name = `/static/${item.name}`;
+    });
+    if (res) {
+      return formatResponse(HTTP_STATUS.OK, 'Get all icons by user', {
+        icons: res,
+      });
+    } else {
+      return formatResponse(
+        HTTP_STATUS.BAD_REQUEST,
+        'Get all icons by user failed',
+        {
+          error_type: GetAllIconsByUserErrorTypeEnums.FAILED_TO_GET,
+        },
+      );
+    }
   }
 }
