@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Users } from '../users/users.entities';
 
 @Entity({ name: 'icons' })
@@ -9,6 +9,7 @@ export class Icons {
   @Column({ name: 'file_name' })
   name: string;
 
+  @JoinColumn({ name: 'user_email' })
   @ManyToOne(() => Users, (users) => users.kinds)
   user: Users;
 }

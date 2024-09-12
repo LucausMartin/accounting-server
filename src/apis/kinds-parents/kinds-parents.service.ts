@@ -25,6 +25,7 @@ export class KindsParentsService {
     name: string,
     file_name: string,
     svg_code_id: string,
+    type: number,
   ) {
     const user = new Users();
     user.email = email;
@@ -33,13 +34,36 @@ export class KindsParentsService {
     kindsParent.fileName = file_name;
     kindsParent.id = generateUUID();
     kindsParent.name = name;
-    kindsParent.svgCode = svg_code_id;
+    kindsParent.svgCodeId = svg_code_id;
+    kindsParent.type = type;
     try {
       await this.KindsParentsRepository.save(kindsParent);
       return true;
     } catch (error) {
       console.log(error);
       return false;
+    }
+  }
+
+  /**
+   * @description 通过邮箱获取种类父级
+   * @param {string} email 用户邮箱
+   * @returns 种类父级
+   */
+  async getKindsParentsByEmail(email: string) {
+    try {
+      const kindParents = await this.KindsParentsRepository.createQueryBuilder(
+        'kindsParents',
+      )
+        .leftJoinAndSelect('kindsParents.svgCodeId', 'svgCodeId')
+        .leftJoinAndSelect('kindsParents.children', 'children')
+        .leftJoinAndSelect('children.svgCodeId', 'childSvgCodeId')
+        .where('kindsParents.user.email = :email', { email })
+        .getMany();
+      return kindParents;
+    } catch (error) {
+      console.log(error);
+      return null;
     }
   }
 }

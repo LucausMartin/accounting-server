@@ -12,6 +12,6 @@ export class SystemIcons {
   @Column({ name: 'svg_code', type: 'longtext' })
   SVGCode: string;
 
-  @OneToMany(() => KindsParents, (kindsParents) => kindsParents.svgCode)
+  @OneToMany(() => KindsParents, (kindsParents) => kindsParents.svgCodeId)
   kinds: KindsParents[];
 }
