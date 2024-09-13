@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, OneToMany } from 'typeorm';
 import { KindsParents } from '../kinds-parents/kinds-parents.entities';
 import { Icons } from '../upload/icons.entities';
+import { Account } from '../account/account.entities';
 
 @Entity({ name: 'users' })
 export class Users {
@@ -15,4 +16,7 @@ export class Users {
 
   @OneToMany(() => Icons, (icons) => icons.user)
   icons: Icons[];
+
+  @OneToMany(() => Account, (account) => account.userEmail)
+  accounts: Account[];
 }

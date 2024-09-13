@@ -8,6 +8,7 @@ import { UploadModule } from './apis/upload/upload.module';
 import { SystemIconsModule } from './apis/system-icons/system-icons.module';
 import { KindsParentsModule } from './apis/kinds-parents/kinds-parents.module';
 import { KindsChildrenModule } from './apis/kinds-children/kinds-children.module';
+import { AccountModule } from './apis/account/account.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { KindsChildrenModule } from './apis/kinds-children/kinds-children.module
     KindsParentsModule,
     SystemIconsModule,
     KindsChildrenModule,
+    AccountModule,
     TypeOrmModule.forRoot(DB_CONFIG),
   ],
   controllers: [],

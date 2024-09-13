@@ -101,8 +101,8 @@ export class UsersController {
       });
     } else {
       return formatResponse(HTTP_STATUS.OK, loginUser.message, {
-        accessToken: this.usersService.generateAccessToken(email),
-        refreshToken: this.usersService.generateRefreshToken(email),
+        access_token: this.usersService.generateAccessToken(email),
+        refresh_token: this.usersService.generateRefreshToken(email),
       });
     }
   }

@@ -4,6 +4,7 @@ import { KindsParents } from '../apis/kinds-parents/kinds-parents.entities';
 import { Icons } from '../apis/upload/icons.entities';
 import { SystemIcons } from 'src/apis/system-icons/system-icons.entities';
 import { KindsChildren } from 'src/apis/kinds-children/kinds-children.entities';
+import { Account } from 'src/apis/account/account.entities';
 
 export const DB_CONFIG: TypeOrmModuleOptions = {
   type: 'mysql',
@@ -14,7 +15,7 @@ export const DB_CONFIG: TypeOrmModuleOptions = {
   database: 'accounting-db',
   autoLoadEntities: true,
   synchronize: false,
-  entities: [Users, KindsParents, Icons, SystemIcons, KindsChildren],
+  entities: [Users, KindsParents, Icons, SystemIcons, KindsChildren, Account],
 };
 
 export const JWT_CONFIG = {

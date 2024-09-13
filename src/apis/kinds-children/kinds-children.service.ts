@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { KindsChildren } from './kinds-children.entities';
 import { generateUUID } from 'src/utils';
-import { Users } from '../users/users.entities';
 
 @Injectable()
 export class KindsChildrenService {
@@ -27,8 +26,6 @@ export class KindsChildrenService {
     svg_code_id: string,
     parent_id: string,
   ) {
-    const user = new Users();
-    user.email = email;
     const kindsChild = new KindsChildren();
     kindsChild.fileName = file_name;
     kindsChild.id = generateUUID();

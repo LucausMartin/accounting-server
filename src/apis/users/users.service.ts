@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import * as nodeMailer from 'nodemailer';
 import { StayStateItemType } from './users.interface';
 import { Users } from './users.entities';
+import { Account } from '../account/account.entities';
 import { RegisterErrorTypeEnums, LoginErrorTypeEnums } from './users.constants';
 import { JwtService } from '@nestjs/jwt';
+import generateUUID from 'src/utils';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(Users)
     private readonly usersRepository: Repository<Users>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
+    @InjectDataSource() private dataSource: DataSource,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -223,7 +228,23 @@ export class UsersService {
         error_type: RegisterErrorTypeEnums.CODE_ERROR,
       };
     }
-    const res = await this.usersRepository.insert({ email });
+    const res = await this.dataSource.transaction<boolean>(
+      async (transactionalEntityManager) => {
+        try {
+          const user = new Users();
+          user.email = email;
+          await transactionalEntityManager.save(user);
+          const account = new Account();
+          account.id = generateUUID();
+          account.userEmail = user;
+          account.name = '日常账单';
+          await transactionalEntityManager.save(account);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    );
     if (!res) {
       return {
         res: false,

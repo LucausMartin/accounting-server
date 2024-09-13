@@ -50,7 +50,7 @@ export class KindsParentsService {
    * @param {string} email 用户邮箱
    * @returns 种类父级
    */
-  async getKindsParentsByEmail(email: string) {
+  async getExpensesKindsParentsByEmail(email: string) {
     try {
       const kindParents = await this.KindsParentsRepository.createQueryBuilder(
         'kindsParents',
@@ -58,7 +58,33 @@ export class KindsParentsService {
         .leftJoinAndSelect('kindsParents.svgCodeId', 'svgCodeId')
         .leftJoinAndSelect('kindsParents.children', 'children')
         .leftJoinAndSelect('children.svgCodeId', 'childSvgCodeId')
-        .where('kindsParents.user.email = :email', { email })
+        .where('kindsParents.user.email = :email AND kindsParents.type = 0', {
+          email,
+        })
+        .getMany();
+      return kindParents;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  /**
+   * @description 通过邮箱获取种类父级
+   * @param {string} email 用户邮箱
+   * @returns 种类父级
+   */
+  async getIncomeKindsParentsByEmail(email: string) {
+    try {
+      const kindParents = await this.KindsParentsRepository.createQueryBuilder(
+        'kindsParents',
+      )
+        .leftJoinAndSelect('kindsParents.svgCodeId', 'svgCodeId')
+        .leftJoinAndSelect('kindsParents.children', 'children')
+        .leftJoinAndSelect('children.svgCodeId', 'childSvgCodeId')
+        .where('kindsParents.user.email = :email AND kindsParents.type = 1', {
+          email,
+        })
         .getMany();
       return kindParents;
     } catch (error) {

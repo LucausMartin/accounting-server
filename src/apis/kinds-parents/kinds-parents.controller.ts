@@ -46,14 +46,15 @@ export class KindsParentsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('get-kinds-parents-by-email')
-  async getKindsParentsByEmail(@Req() request: Request) {
+  @Get('get-expenses-kinds-parents-by-email')
+  async getExpensesKindsParentsByEmail(@Req() request: Request) {
     const { email } = request.user as TokenInfoType;
-    const res = await this.kindsParentsService.getKindsParentsByEmail(email);
+    const res =
+      await this.kindsParentsService.getExpensesKindsParentsByEmail(email);
     if (res) {
       return formatResponse(
         HTTP_STATUS.OK,
-        'Get kinds parents by email successfully',
+        'Get Expenses kinds parents by email successfully',
         {
           success: true,
           kinds_parents: res,
@@ -62,7 +63,33 @@ export class KindsParentsController {
     } else {
       return formatResponse(
         HTTP_STATUS.BAD_REQUEST,
-        'Get kinds parents by email failed',
+        'Get Expenses kinds parents by email failed',
+        {
+          error_type: GetKindsParentsByEmailErrorTypeEnums.FAILED_TO_GET,
+        },
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('get-income-kinds-parents-by-email')
+  async getIncomeKindsParentsByEmail(@Req() request: Request) {
+    const { email } = request.user as TokenInfoType;
+    const res =
+      await this.kindsParentsService.getIncomeKindsParentsByEmail(email);
+    if (res) {
+      return formatResponse(
+        HTTP_STATUS.OK,
+        'Get Income kinds parents by email successfully',
+        {
+          success: true,
+          kinds_parents: res,
+        },
+      );
+    } else {
+      return formatResponse(
+        HTTP_STATUS.BAD_REQUEST,
+        'Get Income kinds parents by email failed',
         {
           error_type: GetKindsParentsByEmailErrorTypeEnums.FAILED_TO_GET,
         },
