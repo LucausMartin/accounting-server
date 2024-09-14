@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { KindsParents } from './kinds-parents.entities';
 import { generateUUID } from 'src/utils';
 import { Users } from '../users/users.entities';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class KindsParentsService {
@@ -36,6 +37,7 @@ export class KindsParentsService {
     kindsParent.name = name;
     kindsParent.svgCodeId = svg_code_id;
     kindsParent.type = type;
+    kindsParent.time = dayjs().format('YYYY-MM-DD HH:mm:ss');
     try {
       await this.KindsParentsRepository.save(kindsParent);
       return true;
@@ -61,7 +63,20 @@ export class KindsParentsService {
         .where('kindsParents.user.email = :email AND kindsParents.type = 0', {
           email,
         })
+        .orderBy('kindsParents.time', 'DESC')
+        .addOrderBy('children.time', 'DESC')
         .getMany();
+      // 将所有 fileName 前面加上 /static/
+      kindParents.forEach((kindParent) => {
+        if (kindParent.fileName) {
+          kindParent.fileName = '/static/' + kindParent.fileName;
+        }
+        kindParent.children.forEach((child) => {
+          if (kindParent.fileName) {
+            child.fileName = '/static/' + child.fileName;
+          }
+        });
+      });
       return kindParents;
     } catch (error) {
       console.log(error);
@@ -85,7 +100,20 @@ export class KindsParentsService {
         .where('kindsParents.user.email = :email AND kindsParents.type = 1', {
           email,
         })
+        .orderBy('kindsParents.time', 'DESC')
+        .addOrderBy('children.time', 'DESC')
         .getMany();
+      // 将所有 fileName 前面加上 /static/
+      kindParents.forEach((kindParent) => {
+        if (kindParent.fileName) {
+          kindParent.fileName = '/static/' + kindParent.fileName;
+        }
+        kindParent.children.forEach((child) => {
+          if (kindParent.fileName) {
+            child.fileName = '/static/' + child.fileName;
+          }
+        });
+      });
       return kindParents;
     } catch (error) {
       console.log(error);

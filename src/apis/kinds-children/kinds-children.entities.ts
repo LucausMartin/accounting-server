@@ -13,6 +13,9 @@ export class KindsChildren {
   @Column({ name: 'file_name' })
   fileName: string;
 
+  @Column({ name: 'time' })
+  time: string;
+
   @JoinColumn({ name: 'svg_code_id' })
   @ManyToOne(() => SystemIcons, (systemIcons) => systemIcons.id)
   svgCodeId: string;

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Account } from '../account/account.entities';
 import { Users } from '../users/users.entities';
 import { generateUUID } from 'src/utils';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class AccountService {
@@ -22,6 +23,7 @@ export class AccountService {
       const accounts = await this.accountRepository
         .createQueryBuilder('account')
         .where('account.userEmail = :email', { email })
+        .orderBy('account.time', 'DESC')
         .getMany();
       return accounts;
     } catch (error) {
@@ -43,6 +45,7 @@ export class AccountService {
     account.userEmail = user;
     account.id = generateUUID();
     account.name = name;
+    account.time = dayjs().format('YYYY-MM-DD HH:mm:ss');
     try {
       await this.accountRepository.save(account);
       return true;

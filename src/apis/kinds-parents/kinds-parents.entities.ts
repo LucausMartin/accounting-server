@@ -24,6 +24,9 @@ export class KindsParents {
   @Column({ name: 'type', type: 'int' })
   type: number;
 
+  @Column({ name: 'time' })
+  time: string;
+
   @JoinColumn({ name: 'svg_code_id' })
   @ManyToOne(() => SystemIcons, (systemIcons) => systemIcons.id)
   svgCodeId: string;

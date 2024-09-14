@@ -9,6 +9,9 @@ export class Account {
   @Column({ name: 'name' })
   name: string;
 
+  @Column({ name: 'time' })
+  time: string;
+
   @JoinColumn({ name: 'user_email' })
   @ManyToOne(() => Users, (users) => users.email)
   userEmail: Users;

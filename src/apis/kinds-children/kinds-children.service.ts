@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { KindsChildren } from './kinds-children.entities';
 import { generateUUID } from 'src/utils';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class KindsChildrenService {
@@ -32,6 +33,7 @@ export class KindsChildrenService {
     kindsChild.name = name;
     kindsChild.svgCodeId = svg_code_id;
     kindsChild.parentId = parent_id;
+    kindsChild.time = dayjs().format('YYYY-MM-DD HH:mm:ss');
     try {
       await this.KindsChildrenRepository.save(kindsChild);
       return true;
