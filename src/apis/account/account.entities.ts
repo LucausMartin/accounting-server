@@ -1,5 +1,13 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Users } from '../users/users.entities';
+import { AccountItem } from '../account-item/account-item.entities';
 
 @Entity({ name: 'account' })
 export class Account {
@@ -15,4 +23,7 @@ export class Account {
   @JoinColumn({ name: 'user_email' })
   @ManyToOne(() => Users, (users) => users.email)
   userEmail: Users;
+
+  @OneToMany(() => AccountItem, (accountItem) => accountItem.userEmail)
+  accountItems: AccountItem[];
 }

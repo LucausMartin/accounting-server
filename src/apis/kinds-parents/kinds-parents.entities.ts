@@ -9,6 +9,7 @@ import {
 import { Users } from '../users/users.entities';
 import { SystemIcons } from '../system-icons/system-icons.entities';
 import { KindsChildren } from '../kinds-children/kinds-children.entities';
+import { AccountItem } from '../account-item/account-item.entities';
 
 @Entity({ name: 'kinds_parents' })
 export class KindsParents {
@@ -37,4 +38,7 @@ export class KindsParents {
 
   @OneToMany(() => KindsChildren, (kindsChildren) => kindsChildren.parentId)
   children: KindsChildren[];
+
+  @OneToMany(() => AccountItem, (accountItem) => accountItem.kindParent)
+  accountItems: AccountItem[];
 }

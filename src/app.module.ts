@@ -9,6 +9,7 @@ import { SystemIconsModule } from './apis/system-icons/system-icons.module';
 import { KindsParentsModule } from './apis/kinds-parents/kinds-parents.module';
 import { KindsChildrenModule } from './apis/kinds-children/kinds-children.module';
 import { AccountModule } from './apis/account/account.module';
+import { AccountItemModule } from './apis/account-item/account-item.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AccountModule } from './apis/account/account.module';
     SystemIconsModule,
     KindsChildrenModule,
     AccountModule,
+    AccountItemModule,
     TypeOrmModule.forRoot(DB_CONFIG),
   ],
   controllers: [],

@@ -72,7 +72,7 @@ export class KindsParentsService {
           kindParent.fileName = '/static/' + kindParent.fileName;
         }
         kindParent.children.forEach((child) => {
-          if (kindParent.fileName) {
+          if (child.fileName) {
             child.fileName = '/static/' + child.fileName;
           }
         });
